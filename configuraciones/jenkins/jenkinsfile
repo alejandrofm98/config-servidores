@@ -1,0 +1,176 @@
+def llamaFuncion = gitGetTags()
+def gitUrl = "https://github.com/alejandrofm98/restaurantqr-backend.git"
+def sshKeyGit = 'ssh_key_git'
+def secrets = ''
+def lastVersion = false
+
+properties([
+  parameters([
+    [
+      $class: 'ChoiceParameter',
+      choiceType: 'PT_SINGLE_SELECT',
+      name: 'Entorno',
+       script: [
+        $class: 'GroovyScript',
+        script: [
+            classpath: [],
+            sandbox: true,
+            script: 'return ["desarrollo","produccion"]'
+        ]
+      ]
+    ],
+     [
+      $class: 'CascadeChoiceParameter',
+      choiceType: 'PT_SINGLE_SELECT',
+      name: 'Version',
+      referencedParameters: 'Entorno',
+       script: [
+        $class: 'GroovyScript',
+        script: [
+            classpath: [],
+            sandbox: false,
+            script: "$llamaFuncion"
+        ]
+      ]
+    ],
+
+ ])
+])
+
+pipeline {
+    agent any
+    tools {
+        maven 'maven 3.9.6'
+    }
+    stages {
+        stage('Clone Config') {
+            steps {
+                echo 'Clonando rama config'
+                git(
+                    url: gitUrl,
+                    credentialsId : sshKeyGit,
+                    branch: 'config',
+                    changelog: true
+                    )
+            }
+        }
+        stage('Replace Config with Secrets') {
+            steps {
+                echo 'Sustituyendo secretos de los ficheros de propiedades'
+                    script {
+                        secrets = 'secrets_' + Entorno
+                        withCredentials([file(credentialsId: secrets, variable: 'secretFile')]) {
+                        // Read the original properties file
+                        def contenido = readFile(secretFile)
+                        def propertiesConcatenar = readFile('configuracion/desarrollo/application.concatenar.properties')
+                        def properties = readFile('configuracion/' + params.Entorno + '/application.properties')
+                        def texto = ''
+                        // Split the credential content into lines and extract key-value pairs
+                        def credentialLines = contenido.readLines()
+                        def propertiesLines = propertiesConcatenar.readLines()
+                        for (int i = 0; i < propertiesLines.size(); i++) {
+                            for (int e = 0; e < credentialLines.size(); e++) {
+                                def splitC = credentialLines[e].trim().split('=')
+                                def splitP = propertiesLines[i].trim().split('=')
+                                if (splitC[0].equals(splitP[0])) {
+                                    texto += splitP[0] + '=' + splitC[1] + '\n'
+                                }
+                            }
+                        }
+                        texto += properties
+                        writeFile(file: '../../configuraciones/application.properties', text: texto, encoding: 'UTF-8')
+                    }
+                }
+            }
+        }
+        stage('Clone Repository') {
+            steps {
+                script {
+                    def versiones = Eval.me('Entorno', Entorno, llamaFuncion)
+                    Map<String,String> mapEntornos = new HashMap<String,String>()
+                    mapEntornos.put("desarrollo","develop")
+                    mapEntornos.put("produccion","main")
+                    println(mapEntornos.get(Entorno))
+                    if (versiones[0].equals(Version)) {
+                        lastVersion = true
+                        println('DESCARGANDO ULTIMO COMMIT DE LA RAMA '+mapEntornos.get(Entorno))
+                        git(
+                            url: gitUrl,
+                            branch: mapEntornos.get(Entorno),
+                            credentialsId: sshKeyGit,
+                            changelog: true
+                        )
+
+                    }
+                    else {
+                        println('DESCARGANDO TAG ' + Version)
+                        def tagVersion = Version.replace("-SNAPSHOT","")
+                        checkout([$class: 'GitSCM',
+                              branches: [[name: tagVersion]],
+                              userRemoteConfigs: [[url: gitUrl]]])
+                    }
+
+                }
+            }
+        }
+       stage('Build') {
+           steps {
+               echo 'Copiando properties a src'
+               sh 'mv ../../configuraciones/application.properties src/main/resources/application.properties'
+               script {
+                   withCredentials([sshUserPrivateKey(credentialsId: sshKeyGit, keyFileVariable: 'SSH_KEY')]) {
+                       if (Entorno.equals('produccion') && lastVersion) {
+                           sh """mvn -e release:clean -DskipTests -Darguments="-DskipTests -Dmaven.deploy.skip=true" release:prepare release:perform"""
+                       }
+                       else{
+                           println("Usando tag, no se crea una nueva Release")
+                           sh """mvn clean package -DskipTests"""
+                       }
+                   }
+               }
+           }
+       }
+    stage('Deploy') {
+        steps {
+            script{
+                println('Levantando aplicación en entorno '+Entorno)
+                def sshServer = 'ssh_servidor_' + Entorno
+                sshPublisher(publishers: [sshPublisherDesc(configName: sshServer, transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '''cd /
+                shopt -s extglob
+                cd /home/opc/desplegar/restaurantqr/
+                rm -rf !(logs|images|demo*.jar)
+                mv demo-*.jar demo.jar
+                rm -f demo-*.jar
+                cd /home/opc/proyectos/aplicacion/
+                docker compose down
+                docker compose up -d --build''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+',
+                remoteDirectory: '/desplegar/restaurantqr', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target/*.jar')],
+                usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            }
+        }
+    }
+    }
+}
+
+def gitGetTags() {
+    def loadScript =
+    """
+    try {
+        def gettags = ('git ls-remote -t https://github.com/alejandrofm98/restaurantqr-backend.git').execute()
+        def tags = gettags.text.readLines().collect { it.split()[1].replaceAll('refs/tags/', '').replaceAll('\\\\^\\\\{}', '')}.unique()
+        tags = tags.sort {s-> s.size()}.reversed()
+        for (int x = tags.size()-1; x >= 10; x--){
+            tags.remove(x)
+        }
+        def proyectName = "demo-"
+        def firstValueNumber = tags.first.replace(proyectName,"").split("\\\\.")
+        tags.add(0,proyectName+firstValueNumber[0]+"."+firstValueNumber[1]+"."+(firstValueNumber[2].toInteger()+1).toString())
+        if (Entorno.equals("desarrollo"))
+            tags = tags.collect(){it+"-SNAPSHOT"}
+        return tags
+    }catch (Exception e) {
+        return [e.dump()]
+    }
+    """
+    return "${loadScript}"
+}
