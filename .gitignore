@@ -1,3 +1,6 @@
 .idea
 configuraciones/jenkins/frontend/.env.produccion
 configuraciones/jenkins/frontend/.env.desarrollo
+configuraciones/jenkins/.env.desarrollo
+configuraciones/jenkins/.env.produccion
+/configuraciones/KEY PUTTY
