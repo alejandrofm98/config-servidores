@@ -1,0 +1,16 @@
+version: '3'
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    volumes:
+      - /home/opc/desplegar/restaurantqr/:/srv/desarrollo
+      - /mnt/produccion:/srv/produccion
+      - ./config/.filebrowser.json:/.filebrowser.json #Change to match your directory
+      - ./database/filebrowser.db:/database/filebrowser.db #Change to match your directory
+
+    environment:
+      - PUID=$(id -u)
+      - PGID=$(id -g)
+    ports:
+      - 8200:8200
