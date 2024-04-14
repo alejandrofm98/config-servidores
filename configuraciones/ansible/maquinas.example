@@ -1,0 +1,16 @@
+[s_apli]
+89.168.63.117
+dev.click2eat.es
+
+[produccion]
+89.168.63.117
+
+[wata]
+bitwarden.click2eat.es
+
+#Ejemplos hay que rellenarlos el fichero real esta en el bitwarden.
+[wata:vars]
+JENKINS_USER_PASSWORD =
+FILEBROWSER_USER_PASSWORD =
+ansible_ssh_user=
+ansible_connection=
