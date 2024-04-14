@@ -23,7 +23,7 @@ class GoogleDriveAPI:
     def get_credentials(self):
         """Get user credentials"""
         creds = service_account.Credentials.from_service_account_file(
-                        filename='key_account_service.json', 
+                        filename='/home/ubuntu/copias_seguridad/key_account_service.json', 
                         scopes=SCOPES)
         return creds
 
@@ -153,17 +153,16 @@ if __name__ == '__main__':
                 matches = [i for i in items if "jenkins" in i['name']]
                 print('Backups de jenkins:')
                 for m in matches:
-                    print(m)
-                    # print(u'{0} ({1})'.format(item['name'], item['id']))
+                    print(u'{0} ({1})'.format(m['name'], m['id']))
 
 
-            # # Download a file
-            # print("Downloading a file...")
-            # success = drive_api.download_file(file_metadata['id'], "/path/to/download/test.txt")
-            # if success:
-            #     print("File downloaded successfully")
-            # else:
-            #     print("Failed to download file")
+            # Download a file
+            print("Descargando Backup de Jenkins")
+            success = drive_api.download_file(matches[0]['id'], "/home/ubuntu/jenkins_volume.tar.gz")
+            if success:
+                print("Descargado correctamente")
+            else:
+                print("Fallo al descargar el backup")
 
         elif parameter == "download_filebrowser":
             pass
