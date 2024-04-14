@@ -6,8 +6,8 @@ services:
     volumes:
       - /home/opc/desplegar/restaurantqr/:/srv/desarrollo
       - /mnt/produccion:/srv/produccion
-      - ./config/.filebrowser.json:/.filebrowser.json #Change to match your directory
-      - ./database/filebrowser.db:/database/filebrowser.db #Change to match your directory
+      - /home/filebrowser/filebrowser_configuration/config/.filebrowser.json:/.filebrowser.json #Change to match your directory
+      - /home/filebrowser/filebrowser_configuration/database/filebrowser.db:/database/filebrowser.db #Change to match your directory
 
     environment:
       - PUID=$(id -u)

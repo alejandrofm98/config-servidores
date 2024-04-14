@@ -4,3 +4,6 @@ configuraciones/jenkins/frontend/.env.desarrollo
 configuraciones/jenkins/.env.desarrollo
 configuraciones/jenkins/.env.produccion
 /configuraciones/KEY PUTTY
+/configuraciones/copias_seguridad/key_account_service.json
+/configuraciones/ansible/ansible.env
+/configuraciones/ansible/maquinas

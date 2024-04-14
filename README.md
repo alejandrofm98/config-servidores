@@ -22,3 +22,7 @@ y la base de datos a la misma vez.
 
 #### Servidor
 Script inicial para realizar la configuración basica del servidor.
+
+#### Ansible
+Recrear fichero maquinas a partir del fichero maquinas.example y usando las varaibles <br/>
+guardadas en el vault de bitwarden

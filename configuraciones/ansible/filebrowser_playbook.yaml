@@ -1,0 +1,31 @@
+---
+- name: playbook
+  become: yes
+  become_method: "sudo"
+  hosts: wata
+  tasks:
+    - name: Creating user "filebrowser" with admin access
+      user:
+        name: filebrowser
+        state: present
+        password:  "{{ FILEBROWSER_USER_PASSWORD }}"
+        groups: sudo
+        append: yes
+
+    - name: Cloning git
+      git:
+        repo: "https://github.com/alejandrofm98/config-servidores.git"
+        dest: "/home/proyectos/config-servidores"
+
+#    - name: Copiando volumen
+#      ansible.builtin.unarchive:
+#        src: /home/ubuntu/jenkins_compose.tar.gz
+#        dest: /home/jenkins/
+#        remote_src: yes
+
+    - name: Run `docker-compose up`
+      community.docker.docker_compose:
+        project_src: /home/proyectos/config-servidores/configuraciones/filebrowser
+        build: true
+      register: output
+

@@ -1,0 +1,40 @@
+---
+- name: playbook
+  become: yes
+  become_method: "sudo"
+  hosts: wata
+
+  tasks:
+    - name: Creating user "jenkins" with admin access
+      user:
+        name: jenkins
+        state: present
+        password:  "{{ JENKINS_USER_PASSWORD }}"
+        groups: sudo
+        append: yes
+
+
+    - name: Cloning git
+      git:
+        repo: "https://github.com/alejandrofm98/config-servidores.git"
+        dest: "/home/proyectos/config-servidores"
+
+    - name: Descarga volumen de drive usando script python
+      become: yes
+      become_method: "sudo"
+      ansible.builtin.script:
+        cmd: /home/proyectos/config-servidores/copias_seguridad/copias_seguridad.py download_jenkins
+        executable: /usr/bin/python3
+
+#    - name: Copiando volumen
+#      ansible.builtin.unarchive:
+#        src: /home/ubuntu/jenkins_compose.tar.gz
+#        dest: /home/jenkins/
+#        remote_src: yes
+#
+#    - name: Run `docker-compose up`
+#      community.docker.docker_compose:
+#        project_src: /home/proyectos/config-servidores/configuraciones/jenkins
+#        build: true
+#      register: output
+
