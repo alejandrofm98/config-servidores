@@ -100,7 +100,10 @@ class GoogleDriveAPI:
         # Download a file
         print("Descargando Backup de "+volume_name)
         path_to_download = "/home/ubuntu/"+volume_name+"_volume.tar.gz"
-        os.remove(path_to_download)
+        try:
+            os.remove(path_to_download)
+        except OSError:
+            pass
         success = drive_api.download_file(matches[0]['id'], path_to_download)
         if success:
             print("Descargado correctamente")

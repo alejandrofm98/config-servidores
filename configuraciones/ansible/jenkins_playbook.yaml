@@ -28,12 +28,12 @@
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
-        cmd: /home/gnome/Escritorio/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download filebrowser
+        cmd: /home/gnome/Escritorio/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download jenkins
         executable: /usr/bin/python3
 
     - name: Copiando volumen
       ansible.builtin.unarchive:
-        src: /home/ubuntu/filebrowser_volume.tar.gz
+        src: /home/ubuntu/jenkins_volume.tar.gz
         dest: /
         remote_src: yes
 
@@ -44,19 +44,19 @@
         name: "Ansible: backup jenkins"
         minute: "0"
         hour: "8"
-        job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup filebrowser"
+        job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup jenkins"
         state: present
 
     - name: Run `docker-compose down`
       community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/filebrowser
+        project_src: /home/proyectos/config-servidores/configuraciones/jenkins
         state: absent
       register: output
 
 
     - name: Run `docker-compose up`
       community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/filebrowser
+        project_src: /home/proyectos/config-servidores/configuraciones/jenkins
         build: true
       register: output
 
