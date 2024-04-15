@@ -81,6 +81,70 @@ class GoogleDriveAPI:
                 folder_id = item['id']
                 print(u'{0} ({1})'.format(item['name'], item['id']))
         return folder_id
+    
+    def download_backup(self,volume_name):
+        folder_id = drive_api.devuelve_id_folder()
+        print("Listing files...")
+        query = "'"+folder_id+"' in parents"
+        # query = ""
+        items = drive_api.list_files(query)
+        if not items:
+            print('No files found.')
+        else:
+            matches = [i for i in items if volume_name in i['name']]
+            print('Backups de '+volume_name+':')
+            for m in matches:
+                print(u'{0} ({1})'.format(m['name'], m['id']))
+
+
+        # Download a file
+        print("Descargando Backup de "+volume_name)
+        path_to_download = "/home/ubuntu/"+volume_name+"_volume.tar.gz"
+        os.remove(path_to_download)
+        success = drive_api.download_file(matches[0]['id'], path_to_download)
+        if success:
+            print("Descargado correctamente")
+        else:
+            print("Fallo al descargar el backup")
+
+    def backup(self, volume_name):
+        if volume_name=="jenkins":
+            path = "/home/jenkins/jenkins_compose/jenkins_configuration"
+        elif volume_name == "filebrowser":
+            path = "/home/filebrowser/filebrowser_configuration"
+        else:
+            print("Error al elegir el backup. Los valores validos son jenkins o filebrowser.")
+            return
+
+        date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+        
+        file_name= date+"_"+volume_name+".tar.gz"
+
+        
+
+
+        tar = Tar()
+        print("Creando copia de "+volume_name)
+        tar.tardirectory(path, file_name)
+
+        folder_id = drive_api.devuelve_id_folder()
+
+
+        print("Subiendo copia de "+volume_name)
+        file_metadata = drive_api.upload_file(file_name, file_name, "application/tar+gzip",folder_id)
+        print(f"Uploaded file with ID {file_metadata['id']}")
+
+
+        print("Listing files...")
+        query = "'"+folder_id+"' in parents"
+        # query = ""
+        items = drive_api.list_files(query)
+        if not items:
+            print('No files found.')
+        else:
+            print('Files:')
+            for item in items:
+                print(u'{0} ({1})'.format(item['name'], item['id']))
 class Tar:
     def tardirectory(self, path,name):
         with tarfile.open(name, "w:gz") as tarhandle:
@@ -91,90 +155,19 @@ class Tar:
 if __name__ == '__main__':
 
     parameter = sys.argv[1]
+    parameter2 = sys.argv[2]
     if parameter is not None:
 
         drive_api = GoogleDriveAPI()
 
     
         if parameter == "backup":
-        
-            date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
+            drive_api.download_backup(parameter2)
 
-            file_name_jenkins = date+"_jenkins.tar.gz"
-            file_name_filebrowser = date+"_filebrowser.tar.gz"
-
-            path_jenkins = "/home/jenkins/jenkins_compose/jenkins_configuration"
-            path_filebrowser = "/home/filebrowser/filebrowser_configuration"
-
-            "./config/.filebrowser.json"
-            "./database/filebrowser.db:"
-
-            tar = Tar()
-            print("Creando copia de Jenkins")
-            tar.tardirectory(path_jenkins, file_name_jenkins)
-            print("Creando copia de Filebrowser")
-            tar.tardirectory(path_filebrowser, file_name_filebrowser)
-
-            folder_id = drive_api.devuelve_id_folder()
-
-
-            print("Subiendo copia de Jenkins")
-            file_metadata = drive_api.upload_file(file_name_jenkins, file_name_jenkins, "application/tar+gzip",folder_id)
-            print(f"Uploaded file with ID {file_metadata['id']}")
-
-            print("Subiendo copia de Filebrowser")
-            file_metadata = drive_api.upload_file(file_name_filebrowser, file_name_filebrowser, "application/tar+gzip",folder_id)
-            print(f"Uploaded file with ID {file_metadata['id']}")
-
-
-
-            print("Listing files...")
-            query = "'"+folder_id+"' in parents"
-            # query = ""
-            items = drive_api.list_files(query)
-            if not items:
-                print('No files found.')
-            else:
-                print('Files:')
-                for item in items:
-                    print(u'{0} ({1})'.format(item['name'], item['id']))
-
-
-        elif parameter == "download_jenkins":
-
-            folder_id = drive_api.devuelve_id_folder()
-            print("Listing files...")
-            query = "'"+folder_id+"' in parents"
-            # query = ""
-            items = drive_api.list_files(query)
-            if not items:
-                print('No files found.')
-            else:
-                matches = [i for i in items if "jenkins" in i['name']]
-                print('Backups de jenkins:')
-                for m in matches:
-                    print(u'{0} ({1})'.format(m['name'], m['id']))
-
-
-            # Download a file
-            print("Descargando Backup de Jenkins")
-            success = drive_api.download_file(matches[0]['id'], "/home/ubuntu/jenkins_volume.tar.gz")
-            if success:
-                print("Descargado correctamente")
-            else:
-                print("Fallo al descargar el backup")
-
-        elif parameter == "download_filebrowser":
-            pass
+        elif parameter == "download":
+            drive_api.download_backup(parameter2)
         else:
             print("No se ha pasado ninguna variable para ejecutar el script.")
-    # # Download a file
-    # print("Downloading a file...")
-    # success = drive_api.download_file(file_metadata['id'], "/path/to/download/test.txt")
-    # if success:
-    #     print("File downloaded successfully")
-    # else:
-    #     print("Failed to download file")
 
     # # Delete a file
     # print("Deleting a file...")

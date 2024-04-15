@@ -7,3 +7,4 @@ configuraciones/jenkins/.env.produccion
 /configuraciones/copias_seguridad/key_account_service.json
 /configuraciones/ansible/ansible.env
 /configuraciones/ansible/maquinas
+configuraciones/jenkins/secretos/
