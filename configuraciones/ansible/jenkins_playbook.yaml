@@ -19,12 +19,12 @@
         repo: "https://github.com/alejandrofm98/config-servidores.git"
         dest: "/home/proyectos/config-servidores"
 
-    - name: Copying maquinas file
-      ansible.builtin.copy:
-        src: maquinas
-        dest: /home/proyectos/config-servidores/configuraciones/ansible/maquinas
+#    - name: Copying maquinas file
+#      ansible.builtin.copy:
+#        src: maquinas
+#        dest: /home/proyectos/config-servidores/configuraciones/ansible/maquinas
 
-    - name: Descarga volumen de drive usando script python
+    - name: Downloading Jenkins volume from drive using python script
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
