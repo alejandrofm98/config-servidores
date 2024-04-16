@@ -23,14 +23,14 @@
         src: maquinas
         dest: /home/proyectos/config-servidores/configuraciones/ansible/maquinas
 
-    - name: Download volume of filebrowser using python script
+    - name: Downloading filebrowser volume using python script
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
         cmd: /home/gnome/Escritorio/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download filebrowser
         executable: /usr/bin/python3
 
-    - name: Copiando volumen
+    - name: Copying filebrowser volume
       ansible.builtin.unarchive:
         src: /home/ubuntu/filebrowser_volume.tar.gz
         dest: /

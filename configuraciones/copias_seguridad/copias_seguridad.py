@@ -165,7 +165,7 @@ if __name__ == '__main__':
 
     
         if parameter == "backup":
-            drive_api.download_backup(parameter2)
+            drive_api.backup(parameter2)
 
         elif parameter == "download":
             drive_api.download_backup(parameter2)

@@ -4,14 +4,10 @@ services:
     image: filebrowser/filebrowser:latest
     restart: always
     container_name: filebrowser
+    user: "${UID}:${GID}"
     volumes:
-      - /home/opc/desplegar/restaurantqr/:/srv/desarrollo
-      - /mnt/produccion:/srv/produccion
       - /home/filebrowser/filebrowser_configuration/config/.filebrowser.json:/.filebrowser.json #Change to match your directory
       - /home/filebrowser/filebrowser_configuration/database/filebrowser.db:/database/filebrowser.db #Change to match your directory
 
-    environment:
-      - PUID=$(id -u)
-      - PGID=$(id -g)
     ports:
       - 8200:8200
