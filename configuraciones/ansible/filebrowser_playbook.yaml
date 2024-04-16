@@ -16,6 +16,7 @@
       git:
         repo: "https://github.com/alejandrofm98/config-servidores.git"
         dest: "/home/proyectos/config-servidores"
+        force: true
 
 
     - name: Copying maquinas file
