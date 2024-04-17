@@ -68,4 +68,13 @@
         group: root
         mode: '0644'
 
+    - name: Create a symbolic link from sites-available to sites-enabled
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/filebrowser.click2eat.es
+        dest: /etc/nginx/sites-enabled/filebrowser.click2eat.es
+        owner: root
+        group: root
+        state: link
 
+#    - name:
+#      ansible.builtin.shell: somescript.sh >> somelog.txt
