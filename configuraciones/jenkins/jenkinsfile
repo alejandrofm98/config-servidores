@@ -4,6 +4,7 @@ def sshKeyGit = 'ssh_key_git'
 def secrets = ''
 def lastVersion = false
 def encoding = 'UTF-8'
+def firebaseFile = 'firebase-service-account.json'
 
 properties([
   parameters([
@@ -83,9 +84,9 @@ pipeline {
                         writeFile(file: '../../configuraciones/application.properties', text: texto, encoding: encoding)
 
                     }
-                        def firebase_file = 'firebase_service_account.json'
-                        withCredentials([file(credentialsId: firebase_file, variable: 'secretFile')]) {
-                            writeFile(file: '../../configuraciones/'+firebase_file, text: readFile(secretFile), encoding: encoding)
+
+                        withCredentials([file(credentialsId: firebaseFile, variable: 'secretFile')]) {
+                            writeFile(file: '../../configuraciones/'+firebaseFile, text: readFile(secretFile), encoding: encoding)
                         }
                 }
             }
@@ -124,7 +125,7 @@ pipeline {
            steps {
                echo 'Copiando properties a src'
                sh 'mv ../../configuraciones/application.properties src/main/resources/application.properties'
-               sh 'mv ../../configuraciones/firebase_service_account.json src/main/resources/firebase_service_account.json'
+               sh 'mv ../../configuraciones/'+firebaseFile+' src/main/resources/'+firebaseFile
                script {
                    withCredentials([sshUserPrivateKey(credentialsId: sshKeyGit, keyFileVariable: 'SSH_KEY')]) {
                        if (Entorno.equals('produccion') && lastVersion) {
