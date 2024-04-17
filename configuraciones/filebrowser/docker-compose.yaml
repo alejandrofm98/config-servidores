@@ -6,7 +6,7 @@ services:
     container_name: filebrowser
     user: "${UID}:${GID}"
     volumes:
-      - /home/filebrowser/filebrowser_configuration/config/.filebrowser.json:/.filebrowser.json #Change to match your directory
+      - /home/filebrowser/filebrowser_configuration/config/.filebrowser.json:.filebrowser.json #Change to match your directory
       - /home/filebrowser/filebrowser_configuration/database/filebrowser.db:/database/filebrowser.db #Change to match your directory
 
     ports:
