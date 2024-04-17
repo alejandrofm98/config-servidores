@@ -62,7 +62,7 @@
     - name: Copy nginx conf file
       ansible.builtin.copy:
         src: /home/proyectos/config-servidores/configuraciones/filebrowser/filebrowser.click2eat.es
-        dest: /etc/nginx/filebrowser.click2eat.es
+        dest: /etc/nginx/sites-available/filebrowser.click2eat.es
         remote_src: yes
         owner: root
         group: root
