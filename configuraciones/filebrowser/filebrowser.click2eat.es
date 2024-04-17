@@ -5,7 +5,7 @@ upstream filebrowser {
 
 
 server {
-    listen 8200;
+    listen 80;
     server_name filebrowser.click2eat.es www.filebrowser.click2eat.es;
     return 301 https://$host$request_uri;
 }
