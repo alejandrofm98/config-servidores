@@ -3,6 +3,7 @@ def gitUrl = "https://github.com/alejandrofm98/restaurantqr-backend.git"
 def sshKeyGit = 'ssh_key_git'
 def secrets = ''
 def lastVersion = false
+def encoding = 'UTF-8'
 
 properties([
   parameters([
@@ -59,6 +60,7 @@ pipeline {
                 echo 'Sustituyendo secretos de los ficheros de propiedades'
                     script {
                         secrets = 'secrets_' + Entorno
+
                         withCredentials([file(credentialsId: secrets, variable: 'secretFile')]) {
                         // Read the original properties file
                         def contenido = readFile(secretFile)
@@ -78,8 +80,13 @@ pipeline {
                             }
                         }
                         texto += properties
-                        writeFile(file: '../../configuraciones/application.properties', text: texto, encoding: 'UTF-8')
+                        writeFile(file: '../../configuraciones/application.properties', text: texto, encoding: encoding)
+
                     }
+                        def firebase_file = 'firebase_service_account.json'
+                        withCredentials([file(credentialsId: firebase_file, variable: 'secretFile')]) {
+                            writeFile(file: '../../configuraciones/'+firebase_file, text: readFile(secretFile), encoding: encoding)
+                        }
                 }
             }
         }
@@ -117,6 +124,7 @@ pipeline {
            steps {
                echo 'Copiando properties a src'
                sh 'mv ../../configuraciones/application.properties src/main/resources/application.properties'
+               sh 'mv ../../configuraciones/firebase_service_account.json src/main/resources/firebase_service_account.json'
                script {
                    withCredentials([sshUserPrivateKey(credentialsId: sshKeyGit, keyFileVariable: 'SSH_KEY')]) {
                        if (Entorno.equals('produccion') && lastVersion) {
@@ -144,7 +152,7 @@ pipeline {
                 cd /home/opc/proyectos/aplicacion/
                 docker compose down
                 docker compose up -d --build''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+',
-                remoteDirectory: '/desplegar/restaurantqr', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target/*.jar')],
+                remoteDirectory: '/home/opc/desplegar/restaurantqr', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target/*.jar')],
                 usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
             }
         }
