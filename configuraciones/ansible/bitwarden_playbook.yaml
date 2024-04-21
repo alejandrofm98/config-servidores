@@ -5,11 +5,11 @@
   hosts: wata
 
   tasks:
-    - name: Creating user "jenkins" with admin access
+    - name: Creating user "bitwarden" with admin access
       user:
-        name: jenkins
+        name: bitwarden
         state: present
-        password:  "{{ JENKINS_USER_PASSWORD }}"
+        password: "{{ BITWARDEN_USER_PASSWORD }}"
         groups: sudo
         append: yes
 
@@ -20,16 +20,21 @@
         dest: "/home/proyectos/config-servidores"
         force: true
 
-    - name: Downloading Jenkins volume from drive using python script
+    - name: Downloading bitwarden volume from drive using python script
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
-        cmd: /home/gnome/Escritorio/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download jenkins
+        cmd: ../copias_seguridad/copias_seguridad.py download bitwarden
         executable: /usr/bin/python3
 
-    - name: Copiando volumen
+    - name: Copying google drive api key
       ansible.builtin.unarchive:
-        src: /home/ubuntu/jenkins_volume.tar.gz
+        src:  ../copias_seguridad/key_account_service.json
+        dest: /
+
+    - name: Copying volume
+      ansible.builtin.unarchive:
+        src: /home/ubuntu/bitwarden_volume.tar.gz
         dest: /
         remote_src: yes
 
@@ -37,29 +42,29 @@
       become: yes
       become_method: sudo
       cron:
-        name: "Ansible: backup jenkins"
+        name: "Ansible: backup bitwarden"
         minute: "0"
         hour: "8"
-        job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup jenkins"
+        job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup bitwarden"
         state: present
 
     - name: Run `docker-compose down`
       community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/jenkins
+        project_src: /home/proyectos/config-servidores/configuraciones/bitwarden
         state: absent
       register: output
 
 
     - name: Run `docker-compose up`
       community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/jenkins
+        project_src: /home/proyectos/config-servidores/configuraciones/bitwarden
         build: true
       register: output
 
     - name: Copy nginx conf file
       ansible.builtin.copy:
-        src: /home/proyectos/config-servidores/configuraciones/jenkins/jenkins.click2eat.es
-        dest: /etc/nginx/sites-available/jenkins.click2eat.es
+        src: /home/proyectos/config-servidores/configuraciones/bitwarden/bitwarden.click2eat.es
+        dest: /etc/nginx/sites-available/bitwarden.click2eat.es
         remote_src: yes
         owner: root
         group: root
@@ -67,8 +72,8 @@
 
     - name: Create a symbolic link from sites-available to sites-enabled
       ansible.builtin.file:
-        src: /etc/nginx/sites-available/jenkins.click2eat.es
-        dest: /etc/nginx/sites-enabled/jenkins.click2eat.es
+        src: /etc/nginx/sites-available/bitwarden.click2eat.es
+        dest: /etc/nginx/sites-enabled/bitwarden.click2eat.es
         owner: root
         group: root
         state: link

@@ -18,12 +18,6 @@
         dest: "/home/proyectos/config-servidores"
         force: true
 
-
-#    - name: Copying maquinas file
-#      ansible.builtin.copy:
-#        src: maquinas
-#        dest: /home/proyectos/config-servidores/configuraciones/ansible/maquinas
-
     - name: Downloading filebrowser volume using python script
       become: yes
       become_method: "sudo"

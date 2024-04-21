@@ -10,6 +10,7 @@ import sys
 
 # If modifying these SCOPES, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
+APPLICATIONS = ['filebrowser','jenkins','bitwarden']
 
 class GoogleDriveAPI:
     """Google Drive API class"""
@@ -22,8 +23,9 @@ class GoogleDriveAPI:
 
     def get_credentials(self):
         """Get user credentials"""
+        key_file_path = 'key_account_service.json'
         creds = service_account.Credentials.from_service_account_file(
-                        filename='/home/ubuntu/copias_seguridad/key_account_service.json', 
+                        filename=key_file_path, 
                         scopes=SCOPES)
         return creds
 
@@ -83,6 +85,8 @@ class GoogleDriveAPI:
         return folder_id
     
     def download_backup(self,volume_name):
+        
+        self.keep_last_five()
         folder_id = drive_api.devuelve_id_folder()
         print("Listing files...")
         query = "'"+folder_id+"' in parents"
@@ -115,14 +119,16 @@ class GoogleDriveAPI:
             path = "/home/jenkins/jenkins_compose/jenkins_configuration"
         elif volume_name == "filebrowser":
             path = "/home/filebrowser/filebrowser_configuration"
+        elif volume_name == "bitwarden":
+            path = "/opt/bitwarden"
         else:
-            print("Error al elegir el backup. Los valores validos son jenkins o filebrowser.")
+            print("Error al elegir el backup. Los valores validos son "+ ', '.join(APPLICATIONS))
             return
 
         date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
         
         file_name= date+"_"+volume_name+".tar.gz"
-
+        
         
 
 
@@ -148,6 +154,24 @@ class GoogleDriveAPI:
             print('Files:')
             for item in items:
                 print(u'{0} ({1})'.format(item['name'], item['id']))
+                
+    def keep_last_five(self):
+        print("Listing files...")
+        folder_id = drive_api.devuelve_id_folder()
+        query = "'"+folder_id+"' in parents"
+        # query = ""
+        items = drive_api.list_files(query)
+        for a in APPLICATIONS:
+            matches = [i for i in items if a in i['name']]
+            cont = 0
+            for m in matches:
+                if cont>=5:
+                    self.delete_file(m['id'])
+                    print(u'Eliminado fichero {0} ({1})'.format(m['name'], m['id']))
+                cont+=1
+
+
+
 class Tar:
     def tardirectory(self, path,name):
         with tarfile.open(name, "w:gz") as tarhandle:
@@ -157,9 +181,13 @@ class Tar:
 # Example usage
 if __name__ == '__main__':
 
-    parameter = sys.argv[1]
-    parameter2 = sys.argv[2]
-    if parameter is not None:
+    parameter, parameter2 = "",""
+    try:
+        parameter = sys.argv[1]
+        parameter2 = sys.argv[2]
+    except:
+        pass
+    if parameter != "":
 
         drive_api = GoogleDriveAPI()
 
@@ -171,8 +199,3 @@ if __name__ == '__main__':
             drive_api.download_backup(parameter2)
         else:
             print("No se ha pasado ninguna variable para ejecutar el script.")
-
-    # # Delete a file
-    # print("Deleting a file...")
-    # drive_api.delete_file(file_metadata['id'])
-    # print("File deleted")

@@ -8,3 +8,5 @@ configuraciones/jenkins/.env.produccion
 /configuraciones/ansible/ansible.env
 /configuraciones/ansible/maquinas
 configuraciones/jenkins/secretos/
+configuraciones/bitwarden/vw-data
+configuraciones/bitwarden/.env
