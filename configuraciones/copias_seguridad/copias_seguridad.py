@@ -23,8 +23,7 @@ class GoogleDriveAPI:
 
     def get_credentials(self):
         """Get user credentials"""
-        key_file_path = '/home/ubuntu/copias_seguridad/key_account_service.json'
-#         key_file_path = 'key_account_service.json'
+        key_file_path = 'key_account_service.json'
         creds = service_account.Credentials.from_service_account_file(
                         filename=key_file_path, 
                         scopes=SCOPES)
@@ -162,7 +161,6 @@ class GoogleDriveAPI:
         query = "'"+folder_id+"' in parents"
         # query = ""
         items = drive_api.list_files(query)
-        print('Backups de filebrowser:')
         for a in APPLICATIONS:
             matches = [i for i in items if a in i['name']]
             cont = 0

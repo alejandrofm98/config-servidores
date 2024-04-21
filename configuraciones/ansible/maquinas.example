@@ -10,6 +10,7 @@ bitwarden.click2eat.es
 
 #Ejemplos hay que rellenarlos el fichero real esta en el bitwarden.
 [wata:vars]
+BITWARDEN_USER_PASSWORD =
 JENKINS_USER_PASSWORD =
 FILEBROWSER_USER_PASSWORD =
 ansible_ssh_user=

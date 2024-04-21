@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       DOMAIN: "https://bitwarden.click2eat.es"
-      ADMIN_TOKEN: ''
+      ADMIN_TOKEN: "${ADMIN_TOKEN}"
     ports:
       - "9000:80"
       - "9012:3012"
