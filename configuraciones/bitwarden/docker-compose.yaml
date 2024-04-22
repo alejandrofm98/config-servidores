@@ -12,4 +12,4 @@ services:
       - "9000:80"
       - "9012:3012"
     volumes:
-      - ./vw-data:/data
+      - /opt/bitwarden/vw-data:/data
