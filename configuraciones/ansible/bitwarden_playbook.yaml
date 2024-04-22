@@ -2,7 +2,7 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: wata
+  hosts: wasta
 
   tasks:
     - name: Creating user "bitwarden" with admin access
@@ -20,23 +20,32 @@
         dest: "/home/proyectos/config-servidores"
         force: true
 
+    - name: Copying google drive api key
+      ansible.builtin.copy:
+        src:  ~/IdeaProjects/config-servidores/configuraciones/copias_seguridad/key_account_service.json
+        dest: /home/proyectos/config-servidores/configuraciones/copias_seguridad/key_account_service.json
+
+
     - name: Downloading bitwarden volume from drive using python script
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
-        cmd: ../copias_seguridad/copias_seguridad.py download bitwarden
+        cmd: ~/IdeaProjects/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download bitwarden
         executable: /usr/bin/python3
 
-    - name: Copying google drive api key
-      ansible.builtin.unarchive:
-        src:  ../copias_seguridad/key_account_service.json
-        dest: /
+
 
     - name: Copying volume
       ansible.builtin.unarchive:
-        src: /home/ubuntu/bitwarden_volume.tar.gz
+        src: /tmp/bitwarden_volume.tar.gz
         dest: /
         remote_src: yes
+
+    - name: Copying .env
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/bitwarden/.env
+        dest: /home/proyectos/config-servidores/configuraciones/bitwarden/.env
+
 
     - name: Create crontab backup.
       become: yes

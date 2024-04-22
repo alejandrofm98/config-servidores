@@ -2,7 +2,7 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: wata
+  hosts: wasta
 
   tasks:
     - name: Creating user "jenkins" with admin access

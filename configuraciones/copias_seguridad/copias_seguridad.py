@@ -10,10 +10,12 @@ import sys
 
 # If modifying these SCOPES, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
-APPLICATIONS = ['filebrowser','jenkins','bitwarden']
+APPLICATIONS = ['filebrowser', 'jenkins', 'bitwarden']
+
 
 class GoogleDriveAPI:
     """Google Drive API class"""
+
     def __init__(self):
         creds = self.get_credentials()
         try:
@@ -23,18 +25,18 @@ class GoogleDriveAPI:
 
     def get_credentials(self):
         """Get user credentials"""
-        key_file_path = 'key_account_service.json'
+        key_file_path = '/home/proyectos/config-servidores/configuraciones/copias_seguridad/key_account_service.json'
         creds = service_account.Credentials.from_service_account_file(
-                        filename=key_file_path, 
-                        scopes=SCOPES)
+            filename=key_file_path,
+            scopes=SCOPES)
         return creds
 
-    def list_files(self, query ,pageSize=10):
+    def list_files(self, query, pageSize=10):
         """List files in Google Drive"""
         try:
             results = self.service.files().list(
                 pageSize=pageSize, fields="nextPageToken, files(id, name)",
-                q=query ).execute()
+                q=query).execute()
             items = results.get('files', [])
             return items
         except HttpError as error:
@@ -73,37 +75,37 @@ class GoogleDriveAPI:
             return True
         except HttpError as error:
             print(f"An error occurred: {error}")
+
     def devuelve_id_folder(self):
         print("Getting id Folders")
-        folder_id=""
+        folder_id = ""
         query = "mimeType = 'application/vnd.google-apps.folder'"
         items = drive_api.list_files(query)
         for item in items:
-            if item['name']=='copias_seguridad':
+            if item['name'] == 'copias_seguridad':
                 folder_id = item['id']
                 print(u'{0} ({1})'.format(item['name'], item['id']))
         return folder_id
-    
-    def download_backup(self,volume_name):
-        
+
+    def download_backup(self, volume_name):
+
         self.keep_last_five()
         folder_id = drive_api.devuelve_id_folder()
         print("Listing files...")
-        query = "'"+folder_id+"' in parents"
+        query = "'" + folder_id + "' in parents"
         # query = ""
         items = drive_api.list_files(query)
         if not items:
             print('No files found.')
         else:
             matches = [i for i in items if volume_name in i['name']]
-            print('Backups de '+volume_name+':')
+            print('Backups de ' + volume_name + ':')
             for m in matches:
                 print(u'{0} ({1})'.format(m['name'], m['id']))
 
-
         # Download a file
-        print("Descargando Backup de "+volume_name)
-        path_to_download = "/home/ubuntu/"+volume_name+"_volume.tar.gz"
+        print("Descargando Backup de " + volume_name)
+        path_to_download = "/tmp/" + volume_name + "_volume.tar.gz"
         try:
             os.remove(path_to_download)
         except OSError:
@@ -115,37 +117,32 @@ class GoogleDriveAPI:
             print("Fallo al descargar el backup")
 
     def backup(self, volume_name):
-        if volume_name=="jenkins":
+        if volume_name == "jenkins":
             path = "/home/jenkins/jenkins_compose/jenkins_configuration"
         elif volume_name == "filebrowser":
             path = "/home/filebrowser/filebrowser_configuration"
         elif volume_name == "bitwarden":
             path = "/opt/bitwarden"
         else:
-            print("Error al elegir el backup. Los valores validos son "+ ', '.join(APPLICATIONS))
+            print("Error al elegir el backup. Los valores validos son " + ', '.join(APPLICATIONS))
             return
 
         date = datetime.today().strftime('%Y-%m-%d_%H:%M:%S')
-        
-        file_name= date+"_"+volume_name+".tar.gz"
-        
-        
 
+        file_name = date + "_" + volume_name + ".tar.gz"
 
         tar = Tar()
-        print("Creando copia de "+volume_name)
+        print("Creando copia de " + volume_name)
         tar.tardirectory(path, file_name)
 
         folder_id = drive_api.devuelve_id_folder()
 
-
-        print("Subiendo copia de "+volume_name)
-        file_metadata = drive_api.upload_file(file_name, file_name, "application/tar+gzip",folder_id)
+        print("Subiendo copia de " + volume_name)
+        file_metadata = drive_api.upload_file(file_name, file_name, "application/tar+gzip", folder_id)
         print(f"Uploaded file with ID {file_metadata['id']}")
 
-
         print("Listing files...")
-        query = "'"+folder_id+"' in parents"
+        query = "'" + folder_id + "' in parents"
         # query = ""
         items = drive_api.list_files(query)
         if not items:
@@ -154,34 +151,35 @@ class GoogleDriveAPI:
             print('Files:')
             for item in items:
                 print(u'{0} ({1})'.format(item['name'], item['id']))
-                
+
     def keep_last_five(self):
         print("Listing files...")
         folder_id = drive_api.devuelve_id_folder()
-        query = "'"+folder_id+"' in parents"
+        query = "'" + folder_id + "' in parents"
         # query = ""
         items = drive_api.list_files(query)
         for a in APPLICATIONS:
             matches = [i for i in items if a in i['name']]
             cont = 0
             for m in matches:
-                if cont>=5:
+                if cont >= 5:
                     self.delete_file(m['id'])
                     print(u'Eliminado fichero {0} ({1})'.format(m['name'], m['id']))
-                cont+=1
-
+                cont += 1
 
 
 class Tar:
-    def tardirectory(self, path,name):
+    def tardirectory(self, path, name):
         with tarfile.open(name, "w:gz") as tarhandle:
             for root, dirs, files in os.walk(path):
                 for f in files:
                     tarhandle.add(os.path.join(root, f))
+
+
 # Example usage
 if __name__ == '__main__':
 
-    parameter, parameter2 = "",""
+    parameter, parameter2 = "", ""
     try:
         parameter = sys.argv[1]
         parameter2 = sys.argv[2]
@@ -191,7 +189,6 @@ if __name__ == '__main__':
 
         drive_api = GoogleDriveAPI()
 
-    
         if parameter == "backup":
             drive_api.backup(parameter2)
 
