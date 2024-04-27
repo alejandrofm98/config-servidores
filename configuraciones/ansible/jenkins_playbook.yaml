@@ -29,7 +29,7 @@
 
     - name: Copiando volumen
       ansible.builtin.unarchive:
-        src: /home/ubuntu/jenkins_volume.tar.gz
+        src: /tmp/jenkins_volume.tar.gz
         dest: /
         remote_src: yes
 
