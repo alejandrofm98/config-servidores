@@ -25,13 +25,14 @@ class GoogleDriveAPI:
 
     def get_credentials(self):
         """Get user credentials"""
-        key_file_path = '/home/proyectos/config-servidores/configuraciones/copias_seguridad/key_account_service.json'
+        key_file_path = 'key_account_service.json'
+        # key_file_path = '/home/proyectos/config-servidores/configuraciones/copias_seguridad/key_account_service.json'
         creds = service_account.Credentials.from_service_account_file(
             filename=key_file_path,
             scopes=SCOPES)
         return creds
 
-    def list_files(self, query, pageSize=10):
+    def list_files(self, query, pageSize=100):
         """List files in Google Drive"""
         try:
             results = self.service.files().list(
@@ -151,6 +152,8 @@ class GoogleDriveAPI:
             print('Files:')
             for item in items:
                 print(u'{0} ({1})'.format(item['name'], item['id']))
+
+        self.keep_last_five()
 
     def keep_last_five(self):
         print("Listing files...")
