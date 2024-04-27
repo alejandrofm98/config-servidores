@@ -25,8 +25,8 @@ class GoogleDriveAPI:
 
     def get_credentials(self):
         """Get user credentials"""
-        key_file_path = 'key_account_service.json'
-        # key_file_path = '/home/proyectos/config-servidores/configuraciones/copias_seguridad/key_account_service.json'
+        # key_file_path = 'key_account_service.json'
+        key_file_path = '/home/proyectos/config-servidores/configuraciones/copias_seguridad/key_account_service.json'
         creds = service_account.Credentials.from_service_account_file(
             filename=key_file_path,
             scopes=SCOPES)
