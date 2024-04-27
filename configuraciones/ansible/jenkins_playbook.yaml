@@ -24,7 +24,7 @@
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
-        cmd: /home/gnome/Escritorio/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download jenkins
+        cmd: ~/IdeaProjects/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download jenkins
         executable: /usr/bin/python3
 
     - name: Copiando volumen
@@ -42,6 +42,11 @@
         hour: "8"
         job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup jenkins"
         state: present
+
+    - name: Copying ssh config
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
+        dest: ~/.ssh/
 
     - name: Run `docker-compose down`
       community.docker.docker_compose:
@@ -78,3 +83,4 @@
 
     - name: Restarting Nginx service
       ansible.builtin.shell: sudo service nginx restart
+

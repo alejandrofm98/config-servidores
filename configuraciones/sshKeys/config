@@ -1,0 +1,7 @@
+HostName dev.click2eat.es
+   User opc
+   IdentityFile ~/.ssh/ssh_key_desarrollo.key
+
+HostName click2eat.es
+   User ubuntu
+   IdentityFile ~/.ssh/ssh_key_produccion.key

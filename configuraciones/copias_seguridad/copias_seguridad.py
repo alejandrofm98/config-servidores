@@ -94,7 +94,6 @@ class GoogleDriveAPI:
         folder_id = drive_api.devuelve_id_folder()
         print("Listing files...")
         query = "'" + folder_id + "' in parents"
-        # query = ""
         items = drive_api.list_files(query)
         if not items:
             print('No files found.')
@@ -144,7 +143,6 @@ class GoogleDriveAPI:
 
         print("Listing files...")
         query = "'" + folder_id + "' in parents"
-        # query = ""
         items = drive_api.list_files(query)
         if not items:
             print('No files found.')
@@ -159,7 +157,6 @@ class GoogleDriveAPI:
         print("Listing files...")
         folder_id = drive_api.devuelve_id_folder()
         query = "'" + folder_id + "' in parents"
-        # query = ""
         items = drive_api.list_files(query)
         for a in APPLICATIONS:
             matches = [i for i in items if a in i['name']]
