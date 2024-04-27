@@ -153,6 +153,17 @@ class GoogleDriveAPI:
 
         self.keep_last_five()
 
+        items = os.listdir('/tmp/')
+        for a in APPLICATIONS:
+            matches = [i for i in items if a in i]
+            cont = 0
+            for m in matches:
+                try:
+                    os.remove(m)
+                except OSError:
+                    pass
+                print('Eliminado fichero '+m +' de la ruta /tmp/')
+
     def keep_last_five(self):
         print("Listing files...")
         folder_id = drive_api.devuelve_id_folder()
@@ -170,7 +181,7 @@ class GoogleDriveAPI:
 
 class Tar:
     def tardirectory(self, path, name):
-        with tarfile.open(name, "w:gz") as tarhandle:
+        with tarfile.open('/tmp/'+name, "w:gz") as tarhandle:
             for root, dirs, files in os.walk(path):
                 for f in files:
                     tarhandle.add(os.path.join(root, f))

@@ -22,12 +22,12 @@
       become: yes
       become_method: "sudo"
       ansible.builtin.script:
-        cmd: /home/gnome/Escritorio/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download filebrowser
+        cmd: ~/IdeaProjects/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download filebrowser
         executable: /usr/bin/python3
 
     - name: Copying filebrowser volume
       ansible.builtin.unarchive:
-        src: /home/ubuntu/filebrowser_volume.tar.gz
+        src: /tmp/filebrowser_volume.tar.gz
         dest: /
         remote_src: yes
 
