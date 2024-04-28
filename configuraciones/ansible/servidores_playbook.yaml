@@ -84,3 +84,59 @@
         name: sshfs
         state: present
         update_cache: true
+
+    - name: Copying ssh config
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
+        dest: ~/.ssh/
+
+    - name: Copying config-servidores
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/aplicacion
+        dest: /home/ubuntu/proyectos
+
+
+
+    - name: Install nginx and certbot
+      apt:
+        pkg:
+          - nginx
+          - certbot
+          - python3-certbot-nginx
+        state: latest
+        update_cache: true
+
+    - name: Copying certificates
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/ssl_certs/
+        dest: /etc/letsencrypt/live
+
+
+    - name: Configuring certbot
+      become: yes
+      become_method: "sudo"
+      ansible.builtin.command: echo -e "1" certbot certonly --cert-name click2eat.es --reuse-key --cert-path /etc/letsencrypt/live/click2eat.es/cert.pem --key-path /etc/letsencrypt/live/click2eat.es/privkey.pem --fullchain-path /etc/letsencrypt/live/click2eat.es/fullchain.pem --chain-path /etc/letsencrypt/live/click2eat.es/chain.pem
+
+    - name: Copy nginx conf file
+      ansible.builtin.copy:
+        src: /home/alejandro/IdeaProjects/config-servidores/configuraciones/aplicacion/api.click2eat.es
+        dest: /etc/nginx/sites-available/api.click2eat.es
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create a symbolic link from sites-available to sites-enabled
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/api.click2eat.es
+        dest: /etc/nginx/sites-enabled/api.click2eat.es
+        owner: root
+        group: root
+        state: link
+
+    - name: Checking Nginx configuration
+      ansible.builtin.shell: sudo nginx -t
+
+    - name: Restarting Nginx service
+      ansible.builtin.shell: sudo service nginx restart
+
+

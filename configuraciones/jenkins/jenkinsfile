@@ -95,10 +95,9 @@ pipeline {
             steps {
                 script {
                     def versiones = Eval.me('Entorno', Entorno, llamaFuncion)
-                    Map<String,String> mapEntornos = new HashMap<String,String>()
+                    def mapEntornos = new HashMap<String,String>()
                     mapEntornos.put("desarrollo","develop")
                     mapEntornos.put("produccion","main")
-                    println(mapEntornos.get(Entorno))
                     if (versiones[0].equals(Version)) {
                         lastVersion = true
                         println('DESCARGANDO ULTIMO COMMIT DE LA RAMA '+mapEntornos.get(Entorno))
@@ -108,7 +107,6 @@ pipeline {
                             credentialsId: sshKeyGit,
                             changelog: true
                         )
-
                     }
                     else {
                         println('DESCARGANDO TAG ' + Version)
@@ -146,14 +144,14 @@ pipeline {
                 def sshServer = 'ssh_servidor_' + Entorno
                 sshPublisher(publishers: [sshPublisherDesc(configName: sshServer, transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '''cd /
                 shopt -s extglob
-                cd /home/opc/desplegar/restaurantqr/
+                cd /home/ubuntu/desplegar/restaurantqr/
                 rm -rf !(logs|images|demo*.jar)
                 mv demo-*.jar demo.jar
                 rm -f demo-*.jar
-                cd /home/opc/proyectos/aplicacion/
+                cd /home/ubuntu/proyectos/aplicacion/
                 docker compose down
                 docker compose up -d --build''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+',
-                remoteDirectory: '/home/opc/desplegar/restaurantqr', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target/*.jar')],
+                remoteDirectory: '/home/ubuntu/desplegar/restaurantqr', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target/*.jar')],
                 usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
             }
         }
@@ -164,20 +162,20 @@ pipeline {
 def gitGetTags() {
     def loadScript =
     """
-    try {
-        def gettags = ('git ls-remote -t https://github.com/alejandrofm98/restaurantqr-backend.git').execute()
-        def tags = gettags.text.readLines().collect { it.split()[1].replaceAll('refs/tags/', '').replaceAll('\\\\^\\\\{}', '')}.unique()
-        tags = tags.sort {s-> s.size()}.reversed()
-        for (int x = tags.size()-1; x >= 10; x--){
-            tags.remove(x)
-        }
-        def proyectName = "demo-"
-        def firstValueNumber = tags.first.replace(proyectName,"").split("\\\\.")
-        tags.add(0,proyectName+firstValueNumber[0]+"."+firstValueNumber[1]+"."+(firstValueNumber[2].toInteger()+1).toString())
-        if (Entorno.equals("desarrollo"))
-            tags = tags.collect(){it+"-SNAPSHOT"}
-        return tags
-    }catch (Exception e) {
+   try {
+    def gettags = ('git ls-remote -t https://github.com/alejandrofm98/restaurantqr-backend.git').execute()
+    def tags = gettags.text.readLines().collect { it.split()[1].replaceAll('refs/tags/', '').replaceAll('\\\\^\\\\{}', '') }.unique()
+    tags = tags.sort { s -> s.size() }.reverse()
+    for (int x = tags.size() - 1; x >= 10; x--) {
+        tags.remove(x)
+    }
+    def proyectName = "demo-"
+    def firstValueNumber = tags.first.replace(proyectName, "").split("\\\\.")
+    tags.add(0, proyectName + firstValueNumber[0] + "." + firstValueNumber[1] + "." + (firstValueNumber[2].toInteger() + 1).toString())
+    if (Entorno.equals("desarrollo"))
+        tags = tags.collect() { it + "-SNAPSHOT" }
+    return tags
+    } catch (Exception e) {
         return [e.dump()]
     }
     """
