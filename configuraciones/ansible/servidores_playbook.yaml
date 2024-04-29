@@ -2,7 +2,7 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: produccion
+  hosts: "{{entorno}}"
   tasks:
     - name: Actualizamos dependencias
       apt:
@@ -95,7 +95,12 @@
         src: ~/IdeaProjects/config-servidores/configuraciones/aplicacion
         dest: /home/ubuntu/proyectos
 
-
+    - name: Renaming .env
+      ansible.builtin.file:
+        src: /home/ubuntu/proyectos/aplicacion/{{env}}
+        dest: /home/ubuntu/proyectos/aplicacion/.env
+        state: hard
+        force: yes
 
     - name: Install nginx and certbot
       apt:
@@ -117,18 +122,20 @@
       become_method: "sudo"
       ansible.builtin.command: echo -e "1" certbot certonly --cert-name click2eat.es --reuse-key --cert-path /etc/letsencrypt/live/click2eat.es/cert.pem --key-path /etc/letsencrypt/live/click2eat.es/privkey.pem --fullchain-path /etc/letsencrypt/live/click2eat.es/fullchain.pem --chain-path /etc/letsencrypt/live/click2eat.es/chain.pem
 
+
+
     - name: Copy nginx conf file
       ansible.builtin.copy:
-        src: /home/alejandro/IdeaProjects/config-servidores/configuraciones/aplicacion/api.click2eat.es
-        dest: /etc/nginx/sites-available/api.click2eat.es
+        src: /home/alejandro/IdeaProjects/config-servidores/configuraciones/aplicacion/{{fichero_nginx}}
+        dest: /etc/nginx/sites-available/{{fichero_nginx}}
         owner: root
         group: root
         mode: '0644'
 
     - name: Create a symbolic link from sites-available to sites-enabled
       ansible.builtin.file:
-        src: /etc/nginx/sites-available/api.click2eat.es
-        dest: /etc/nginx/sites-enabled/api.click2eat.es
+        src: /etc/nginx/sites-available/{{fichero_nginx}}
+        dest: /etc/nginx/sites-enabled/{{fichero_nginx}}
         owner: root
         group: root
         state: link

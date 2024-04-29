@@ -26,3 +26,5 @@ Script inicial para realizar la configuración basica del servidor.
 #### Ansible
 Recrear fichero maquinas a partir del fichero maquinas.example y usando las varaibles <br/>
 guardadas en el vault de bitwarden
+
+ansible-playbook servidores_playbook.yaml -e "entorno=desarrollo|produccion"
