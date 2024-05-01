@@ -12,3 +12,7 @@ configuraciones/bitwarden/vw-data
 configuraciones/bitwarden/.env
 configuraciones/sshKeys/ssh_key_desarrollo.key
 configuraciones/sshKeys/ssh_key_produccion.key
+configuraciones/sshKeys/ssh_key_git.key
+lib/*
+configuraciones/aplicacion/.env*
+configuraciones/ssl_certs
