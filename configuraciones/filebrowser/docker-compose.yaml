@@ -8,8 +8,8 @@ services:
     volumes:
       - /home/filebrowser/filebrowser_configuration/config/.filebrowser.json:/.filebrowser.json
       - /home/filebrowser/filebrowser_configuration/database/filebrowser.db:/database/filebrowser.db
-      - /mnt/filebrowser/des:/mnt/des
-      - /mnt/filebrowser/pro:/mnt/pro
+      - /home/filebrowser/mnt/des:/srv/des
+      - /home/filebrowser/mnt/pro:/srv/pro
 
     ports:
       - 8200:8200
