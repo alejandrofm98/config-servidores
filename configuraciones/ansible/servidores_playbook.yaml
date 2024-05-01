@@ -78,17 +78,24 @@
         url: https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-aarch64
         dest: /usr/local/bin/docker-compose
         mode: 'u+x,g+x'
-
+#
     - name: Install SSHFS
       apt:
         name: sshfs
         state: present
         update_cache: true
 
-    - name: Copying ssh config
+    - name: Copying ssh config to root
       ansible.builtin.copy:
         src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
         dest: ~/.ssh/
+        force: true
+
+    - name: Copying ssh config to ubuntu
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
+        dest: /home/ubuntu/.ssh/
+        force: true
 
     - name: Copying config-servidores
       ansible.builtin.copy:
