@@ -138,7 +138,7 @@ class GoogleDriveAPI:
         folder_id = drive_api.devuelve_id_folder()
 
         print("Subiendo copia de " + volume_name)
-        file_metadata = drive_api.upload_file(file_name, file_name, "application/tar+gzip", folder_id)
+        file_metadata = drive_api.upload_file(file_name, "/tmp/"+file_name, "application/tar+gzip", folder_id)
         print(f"Uploaded file with ID {file_metadata['id']}")
 
         print("Listing files...")
