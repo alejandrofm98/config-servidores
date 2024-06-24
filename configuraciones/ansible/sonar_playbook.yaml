@@ -1,0 +1,36 @@
+---
+- name: playbook
+  become: yes
+  become_method: "sudo"
+  hosts: wasta
+  tasks:
+    - name: Creating user "sonar" with admin access
+      user:
+        name: sonar
+        state: present
+        password:  "{{ SONAR_USER_PASSWORD }}"
+        groups: sudo
+        append: yes
+
+    - name: Cloning git
+      git:
+        repo: "https://github.com/alejandrofm98/config-servidores.git"
+        dest: "/home/proyectos/config-servidores"
+        force: true
+
+    - name: Copying .env
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/sonar/.env
+        dest: /home/proyectos/config-servidores/configuraciones/sonar/.env
+
+    - name: Run `docker-compose down`
+      community.docker.docker_compose:
+        project_src: /home/proyectos/config-servidores/configuraciones/sonar
+        state: absent
+      register: output
+
+    - name: Run `docker-compose up`
+      community.docker.docker_compose:
+        project_src: /home/proyectos/config-servidores/configuraciones/sonar
+        build: true
+      register: output
