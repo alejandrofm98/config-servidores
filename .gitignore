@@ -16,3 +16,4 @@ configuraciones/sshKeys/ssh_key_git.key
 lib/*
 configuraciones/aplicacion/.env*
 configuraciones/ssl_certs
+/configuraciones/sonar/.env
