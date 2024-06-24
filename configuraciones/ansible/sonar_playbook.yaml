@@ -18,6 +18,11 @@
         dest: "/home/proyectos/config-servidores"
         force: true
 
+    - name: Copying .env
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/sonar/.env
+        dest: /home/proyectos/config-servidores/configuraciones/sonar/.env
+
     - name: Run `docker-compose down`
       community.docker.docker_compose:
         project_src: /home/proyectos/config-servidores/configuraciones/sonar
