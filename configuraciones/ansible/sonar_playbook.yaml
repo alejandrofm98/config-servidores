@@ -34,3 +34,26 @@
         project_src: /home/proyectos/config-servidores/configuraciones/sonar
         build: true
       register: output
+
+    - name: Copy nginx conf file
+      ansible.builtin.copy:
+        src: /home/proyectos/config-servidores/configuraciones/sonar/sonar.click2eat.es
+        dest: /etc/nginx/sites-available/sonar.click2eat.es
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create a symbolic link from sites-available to sites-enabled
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/sonar.click2eat.es
+        dest: /etc/nginx/sites-enabled/sonar.click2eat.es
+        owner: root
+        group: root
+        state: link
+
+    - name: Checking Nginx configuration
+      ansible.builtin.shell: sudo nginx -t
+
+    - name: Restarting Nginx service
+      ansible.builtin.shell: sudo service nginx restart
