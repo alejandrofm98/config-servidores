@@ -6,14 +6,14 @@ upstream filebrowser {
 
 server {
     listen 80;
-    server_name www.filebrowser.click2eat.es filebrowser.click2eat.es ;
-    return 301 https://$host$request_uri;
+    server_name  filebrowser.click2eat.es ;
+    return 301 https://www.$host$request_uri;
 }
 
 
 server {
 
-  server_name  www.filebrowser.click2eat.es filebrowser.click2eat.es ;
+  server_name  filebrowser.click2eat.es ;
    listen 443 ssl;
 
     ssl_certificate /etc/letsencrypt/live/click2eat.es/fullchain.pem;
@@ -29,6 +29,8 @@ server {
     # rewrite all static files into requests to the root
     # E.g /static/12345678/css/something.css will become /css/something.css
     rewrite "^/static/[0-9a-fA-F]{8}\/(.*)" /$1 last;
+
+   return 301 https://www.$host$request_uri;
   }
 
 
