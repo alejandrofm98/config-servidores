@@ -9,7 +9,7 @@
         name: sonar
         state: present
         password:  "{{ SONAR_USER_PASSWORD }}"
-        groups: sudo
+        groups: sudo,docker
         append: yes
 
     - name: Cloning git
