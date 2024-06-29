@@ -4,6 +4,9 @@ services:
   sonarqube:
     image: sonarqube:lts-community
     restart: always
+    tty: true
+    sysctls:
+      - vm.max_map_count=262144
     depends_on:
       - sonar_db
     environment:
@@ -13,7 +16,8 @@ services:
     ports:
       - "9001:9000"
     volumes:
-      - sonarqube_conf:/opt/sonarqube/conf
+      - /home/sonar/conf:/opt/sonarqube/conf
+      - /home/sonar/etc:/etc/
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
@@ -31,7 +35,6 @@ services:
       - sonar_db_data:/var/lib/postgresql/data
 
 volumes:
-  sonarqube_conf:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:

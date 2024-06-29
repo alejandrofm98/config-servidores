@@ -6,14 +6,14 @@ upstream filebrowser {
 
 server {
     listen 80;
-    server_name filebrowser.click2eat.es www.filebrowser.click2eat.es;
+    server_name www.filebrowser.click2eat.es filebrowser.click2eat.es ;
     return 301 https://$host$request_uri;
 }
 
 
 server {
 
-  server_name     filebrowser.click2eat.es www.filebrowser.click2eat.es;
+  server_name  www.filebrowser.click2eat.es filebrowser.click2eat.es ;
    listen 443 ssl;
 
     ssl_certificate /etc/letsencrypt/live/click2eat.es/fullchain.pem;
