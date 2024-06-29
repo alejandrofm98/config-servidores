@@ -18,10 +18,10 @@ services:
     volumes:
       - /home/sonar/conf:/opt/sonarqube/conf
       - /home/sonar/etc:/etc/
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-      - sonarqube_logs:/opt/sonarqube/logs
-      - sonarqube_temp:/opt/sonarqube/temp
+      - /home/sonar/data:/opt/sonarqube/data
+      - /home/sonar/extensions:/opt/sonarqube/extensions
+      - /home/sonar/logs:/opt/sonarqube/logs
+      - /home/sonar/temp:/opt/sonarqube/temp
 
   sonar_db:
     image: postgres:13
