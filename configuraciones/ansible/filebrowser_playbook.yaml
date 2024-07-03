@@ -2,44 +2,44 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: wasta
+  hosts: desarrollo
   tasks:
-    - name: Creating user "filebrowser" with admin access
-      user:
-        name: filebrowser
-        state: present
-        password:  "{{ FILEBROWSER_USER_PASSWORD }}"
-        groups: sudo
-        append: yes
+#    - name: Creating user "filebrowser" with admin access
+#      user:
+#        name: filebrowser
+#        state: present
+#        password:  "{{ FILEBROWSER_USER_PASSWORD }}"
+#        groups: sudo
+#        append: yes
 
     - name: Cloning git
       git:
         repo: "https://github.com/alejandrofm98/config-servidores.git"
         dest: "/home/proyectos/config-servidores"
         force: true
-
-    - name: Downloading filebrowser volume using python script
-      become: yes
-      become_method: "sudo"
-      ansible.builtin.script:
-        cmd: ~/IdeaProjects/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download filebrowser
-        executable: /usr/bin/python3
-
-    - name: Copying filebrowser volume
-      ansible.builtin.unarchive:
-        src: /tmp/filebrowser_volume.tar.gz
-        dest: /
-        remote_src: yes
-
-    - name: Create crontab backup.
-      become: yes
-      become_method: sudo
-      cron:
-        name: "Ansible: backup filebrowser"
-        minute: "0"
-        hour: "8"
-        job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup filebrowser"
-        state: present
+#
+#    - name: Downloading filebrowser volume using python script
+#      become: yes
+#      become_method: "sudo"
+#      ansible.builtin.script:
+#        cmd: ~/IdeaProjects/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py download filebrowser
+#        executable: /usr/bin/python3
+#
+#    - name: Copying filebrowser volume
+#      ansible.builtin.unarchive:
+#        src: /tmp/filebrowser_volume.tar.gz
+#        dest: /
+#        remote_src: yes
+#
+#    - name: Create crontab backup.
+#      become: yes
+#      become_method: sudo
+#      cron:
+#        name: "Ansible: backup filebrowser"
+#        minute: "0"
+#        hour: "8"
+#        job: "python3 /home/proyectos/config-servidores/configuraciones/copias_seguridad/copias_seguridad.py backup filebrowser"
+#        state: present
 
     - name: Run `docker-compose down`
       community.docker.docker_compose:
