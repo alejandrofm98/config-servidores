@@ -17,3 +17,4 @@ lib/*
 configuraciones/aplicacion/.env*
 configuraciones/ssl_certs
 /configuraciones/sonar/.env
+/configuraciones/github/.env
