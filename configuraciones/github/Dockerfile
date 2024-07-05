@@ -16,7 +16,9 @@ RUN apt-get install -y --no-install-recommends \
 
 RUN curl -fsSL https://get.docker.com/ | sh
 
+RUN groupadd docker
 RUN usermod -aG docker docker
+RUN newgrp docker
 
 # cd into the user directory, download and unzip the github actions runner
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
@@ -25,6 +27,7 @@ RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
 
 # install some additional dependencies
 RUN chown -R docker ~docker && /home/docker/actions-runner/bin/installdependencies.sh
+
 
 # add over the start.sh script
 ADD scripts/start.sh start.sh
