@@ -2,7 +2,7 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: produccion
+  hosts: desarrollo
   tasks:
     - name: Creating user "github_actions" with admin access
       user:
