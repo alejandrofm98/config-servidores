@@ -13,3 +13,5 @@ services:
       GH_OWNER: ${GH_OWNER}
       GH_REPOSITORY: ${GH_REPOSITORY}
       ENTORNO: ${ENTORNO}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
