@@ -43,8 +43,11 @@
           - python3-pip
           - virtualenv
           - python3-setuptools
+          - maven
         state: latest
         update_cache: true
+
+
     - name: Add Docker GPG apt Key
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -84,6 +87,7 @@
         name: sshfs
         state: present
         update_cache: true
+
 
     - name: Copying ssh config to root
       ansible.builtin.copy:
