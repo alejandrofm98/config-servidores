@@ -1,0 +1,26 @@
+---
+- name: playbook
+  become: yes
+  become_method: "sudo"
+  hosts: "{{entorno}}"
+
+  tasks:
+    - name: Copying config-servidores
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/database
+        dest: /home/ubuntu/
+
+    - name: Create shared network
+      command: docker network create shared-network
+
+    - name: Run `docker-compose down`
+      community.docker.docker_compose_v2:
+        project_src: /home/ubuntu/database
+        state: absent
+      register: output
+
+    - name: Run `docker-compose up`
+      community.docker.docker_compose_v2:
+        project_src: /home/ubuntu/database
+        build: always
+      register: output
