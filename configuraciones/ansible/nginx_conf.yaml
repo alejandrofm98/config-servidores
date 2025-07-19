@@ -10,3 +10,8 @@
         force: yes
         update: yes
 
+    - name: Crear red "shared_net" si no existe
+      community.docker.docker_network:
+        name: nginx-net
+        driver: bridge
+        attachable: true

@@ -22,5 +22,5 @@ services:
 
 
 networks:
-  app-net:
+  nginx-net:
     external: true
