@@ -1,0 +1,12 @@
+---
+- name: playbook
+  hosts: "{{entorno}}"
+  tasks:
+    - name: Clonando repositorio git config-servidores
+      git:
+        repo: "https://github.com/alejandrofm98/config-servidores"
+        dest: "/home/proyectos/config-servidores"
+        version: develop
+        force: yes
+        update: yes
+
