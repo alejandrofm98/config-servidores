@@ -18,3 +18,6 @@ configuraciones/aplicacion/.env*
 configuraciones/ssl_certs
 /configuraciones/sonar/.env
 /configuraciones/github/.env
+/configuraciones/database/.env
+/configuraciones/sshKeys/private_key_pro.key
+/configuraciones/sshKeys/private_key_utilidades.key

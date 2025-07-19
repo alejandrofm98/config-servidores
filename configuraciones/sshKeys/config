@@ -1,9 +1,11 @@
-Host des
-   HostName dev.click2eat.es
-   User ubuntu
-   IdentityFile ~/.ssh/ssh_key_desarrollo.key
-
 Host pro
-   HostName api.click2eat.es
-   User ubuntu
-   IdentityFile ~/.ssh/ssh_key_produccion.key
+	Hostname 144.24.207.218
+	User ubuntu
+	IdentityFile ~/.ssh/private_key_pro.key
+
+Host utilidades
+	Hostname 129.151.228.53
+	User ubuntu
+	IdentityFile ~/.ssh/private_key_utilidades.key
+
+

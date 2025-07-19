@@ -4,35 +4,35 @@
   become_method: "sudo"
   hosts: "{{entorno}}"
   tasks:
-    - name: Actualizamos dependencias
-      apt:
-        upgrade: yes
-        update_cache: yes
-        cache_valid_time: 86400
-
-    - name: Actualizamos aptitude
-      apt:
-        name: aptitude
-        state: latest
-        update_cache: yes
-
-    - name: Install git
-      apt:
-        name: git
-        state: present
-        update_cache: yes
-    - name: Install VIM and nano
-      apt:
-        name: nano
-        state: present
-        update_cache: yes
-
-    - name: Comprueba existe vim
-      apt:
-        name: vim
-        state: present
-        update_cache: yes
-
+#    - name: Actualizamos dependencias
+#      apt:
+#        upgrade: yes
+#        update_cache: yes
+#        cache_valid_time: 86400
+#
+#    - name: Actualizamos aptitude
+#      apt:
+#        name: aptitude
+#        state: latest
+#        update_cache: yes
+#
+#    - name: Install git
+#      apt:
+#        name: git
+#        state: present
+#        update_cache: yes
+#    - name: Install VIM and nano
+#      apt:
+#        name: nano
+#        state: present
+#        update_cache: yes
+#
+#    - name: Comprueba existe vim
+#      apt:
+#        name: vim
+#        state: present
+#        update_cache: yes
+#
     - name: Install docker dependencies
       apt:
         pkg:
@@ -44,6 +44,7 @@
           - virtualenv
           - python3-setuptools
           - maven
+          - python3-docker
         state: latest
         update_cache: true
 
@@ -61,57 +62,49 @@
         name: docker-ce
         state: latest
         update_cache: true
-    - name: Install Docker Module for Python
-      pip:
-        name: docker
+
+#    - name: Install Docker Module for Python
+#      pip:
+#        name: docker
 
     - name: Create "docker" group
       group:
         name: "docker"
         state: present
-
-    - name: Add remote "ubuntu" user to "docker" group
-      user:
-        name: "ubuntu"
-        group: "docker"
-        append: yes
-
+#
+#    - name: Add remote "ubuntu" user to "docker" group
+#      user:
+#        name: "ubuntu"
+#        group: "docker"
+#        append: yes
+#
     - name: install docker-compose
       get_url:
         url: https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-aarch64
         dest: /usr/local/bin/docker-compose
         mode: 'u+x,g+x'
-#
+
+    - name: Add permission docker for all users
+      command: chmod 0666 /var/run/docker.sock
+
     - name: Install SSHFS
       apt:
         name: sshfs
         state: present
         update_cache: true
 
-
-    - name: Copying ssh config to root
-      ansible.builtin.copy:
-        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
-        dest: ~/.ssh/
-        force: true
-
-    - name: Copying ssh config to ubuntu
-      ansible.builtin.copy:
-        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
-        dest: /home/ubuntu/.ssh/
-        force: true
-
-    - name: Copying config-servidores
-      ansible.builtin.copy:
-        src: ~/IdeaProjects/config-servidores/configuraciones/aplicacion
-        dest: /home/ubuntu/proyectos
-
-    - name: Renaming .env
-      ansible.builtin.file:
-        src: /home/ubuntu/proyectos/aplicacion/{{env}}
-        dest: /home/ubuntu/proyectos/aplicacion/.env
-        state: hard
-        force: yes
+#
+#    - name: Copying ssh config to root
+#      ansible.builtin.copy:
+#        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
+#        dest: ~/.ssh/
+#        force: true
+#
+#    - name: Copying ssh config to ubuntu
+#      ansible.builtin.copy:
+#        src: ~/IdeaProjects/config-servidores/configuraciones/sshKeys/
+#        dest: /home/ubuntu/.ssh/
+#        force: true
 
     - name: Install nginx and certbot
       apt:
@@ -125,36 +118,38 @@
     - name: Copying certificates
       ansible.builtin.copy:
         src: ~/IdeaProjects/config-servidores/configuraciones/ssl_certs/
-        dest: /etc/letsencrypt/live
+        dest: /etc/letsencrypt/live/click2eat.es
 
+#
+#    - name: Copy nginx conf file
+#      ansible.builtin.copy:
+#        src: /home/alejandro/IdeaProjects/config-servidores/configuraciones/aplicacion/{{fichero_nginx}}
+#        dest: /etc/nginx/sites-available/{{fichero_nginx}}
+#        owner: root
+#        group: root
+#        mode: '0644'
+#
+#    - name: Create a symbolic link from sites-available to sites-enabled
+#      ansible.builtin.file:
+#        src: /etc/nginx/sites-available/{{fichero_nginx}}
+#        dest: /etc/nginx/sites-enabled/{{fichero_nginx}}
+#        owner: root
+#        group: root
+#        state: link
 
-    - name: Configuring certbot
-      become: yes
-      become_method: "sudo"
-      ansible.builtin.command: echo -e "1" certbot certonly --cert-name click2eat.es --reuse-key --cert-path /etc/letsencrypt/live/click2eat.es/cert.pem --key-path /etc/letsencrypt/live/click2eat.es/privkey.pem --fullchain-path /etc/letsencrypt/live/click2eat.es/fullchain.pem --chain-path /etc/letsencrypt/live/click2eat.es/chain.pem
+#
+#    - name: Checking Nginx configuration
+#      ansible.builtin.shell: sudo nginx -t
+#
+#    Solo es necesario ejecutar 1 vez
+#    - name: Open ports iptable
+#      ansible.builtin.shell:
+#        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 443 -j ACCEPT &&
+#        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 443 -j ACCEPT &&
+#        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT &&
+#        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT
 
-
-
-    - name: Copy nginx conf file
-      ansible.builtin.copy:
-        src: /home/alejandro/IdeaProjects/config-servidores/configuraciones/aplicacion/{{fichero_nginx}}
-        dest: /etc/nginx/sites-available/{{fichero_nginx}}
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: Create a symbolic link from sites-available to sites-enabled
-      ansible.builtin.file:
-        src: /etc/nginx/sites-available/{{fichero_nginx}}
-        dest: /etc/nginx/sites-enabled/{{fichero_nginx}}
-        owner: root
-        group: root
-        state: link
-
-    - name: Checking Nginx configuration
-      ansible.builtin.shell: sudo nginx -t
-
-    - name: Restarting Nginx service
-      ansible.builtin.shell: sudo service nginx restart
+#    - name: Restarting Nginx service
+#      ansible.builtin.shell: sudo service nginx restart
 
 

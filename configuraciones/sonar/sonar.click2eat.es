@@ -8,6 +8,9 @@ server {
     listen 443 ssl;
     server_name sonar.click2eat.es www.sonar.click2eat.es;
 
+    access_log /var/log/nginx/sonar.click2eat.es.access.log;
+    error_log /var/log/nginx/sonar.click2eat.es.error.log;
+
     ssl_certificate /etc/letsencrypt/live/click2eat.es/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/click2eat.es/privkey.pem;
 

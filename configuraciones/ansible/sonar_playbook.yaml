@@ -2,7 +2,7 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: wasta
+  hosts: utilidades
   tasks:
     - name: Creating user "sonar" with admin access
       user:
@@ -12,32 +12,27 @@
         groups: sudo,docker
         append: yes
 
-    - name: Cloning git
-      git:
-        repo: "https://github.com/alejandrofm98/config-servidores.git"
-        dest: "/home/proyectos/config-servidores"
-        force: true
 
-    - name: Copying .env
+    - name: Copying sonar folder
       ansible.builtin.copy:
-        src: ~/IdeaProjects/config-servidores/configuraciones/sonar/.env
-        dest: /home/proyectos/config-servidores/configuraciones/sonar/.env
+        src: ~/IdeaProjects/config-servidores/configuraciones/sonar/
+        dest: /home/ubuntu/sonar/
 
     - name: Run `docker-compose down`
-      community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/sonar
+      community.docker.docker_compose_v2:
+        project_src: /home/ubuntu/sonar/
         state: absent
       register: output
 
     - name: Run `docker-compose up`
-      community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/sonar
-        build: true
+      community.docker.docker_compose_v2:
+        project_src: /home/ubuntu/sonar/
+        build: always
       register: output
 
     - name: Copy nginx conf file
       ansible.builtin.copy:
-        src: /home/proyectos/config-servidores/configuraciones/sonar/sonar.click2eat.es
+        src:  /home/ubuntu/sonar/sonar.click2eat.es
         dest: /etc/nginx/sites-available/sonar.click2eat.es
         remote_src: yes
         owner: root
@@ -54,6 +49,14 @@
 
     - name: Checking Nginx configuration
       ansible.builtin.shell: sudo nginx -t
+
+#    Solo es necesario ejecutar 1 vez
+#    - name: Open ports iptable
+#      ansible.builtin.shell:
+#        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 443 -j ACCEPT &&
+#        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 443 -j ACCEPT &&
+#        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT &&
+#        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT
 
     - name: Restarting Nginx service
       ansible.builtin.shell: sudo service nginx restart

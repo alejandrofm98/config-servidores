@@ -2,22 +2,21 @@
 - name: playbook
   become: yes
   become_method: "sudo"
-  hosts: desarrollo
+  hosts: utilidades
   tasks:
-#    - name: Creating user "filebrowser" with admin access
-#      user:
-#        name: filebrowser
-#        state: present
-#        password:  "{{ FILEBROWSER_USER_PASSWORD }}"
-#        groups: sudo
-#        append: yes
+    - name: Creating user "filebrowser" with admin access
+      user:
+        name: filebrowser
+        state: present
+        password: "{{ FILEBROWSER_USER_PASSWORD }}"
+        groups: sudo
+        append: yes
 
-    - name: Cloning git
-      git:
-        repo: "https://github.com/alejandrofm98/config-servidores.git"
-        dest: "/home/proyectos/config-servidores"
-        force: true
-#
+    - name: Copying filebrowser folder
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/filebrowser/
+        dest: /home/ubuntu/filebrowser/
+
 #    - name: Downloading filebrowser volume using python script
 #      become: yes
 #      become_method: "sudo"
@@ -42,14 +41,14 @@
 #        state: present
 
     - name: Run `docker-compose down`
-      community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/filebrowser
+      community.docker.docker_compose_v2:
+        project_src: /home/ubuntu/filebrowser/
         state: absent
       register: output
 
     - name: Run `docker-compose up`
-      community.docker.docker_compose:
-        project_src: /home/proyectos/config-servidores/configuraciones/filebrowser
+      community.docker.docker_compose_v2:
+        project_src: /home/ubuntu/filebrowser/
         build: true
       register: output
 
@@ -72,6 +71,14 @@
 
     - name: Checking Nginx configuration
       ansible.builtin.shell: sudo nginx -t
+
+    #    Solo es necesario ejecutar 1 vez
+    #    - name: Open ports iptable
+    #      ansible.builtin.shell:
+    #        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 443 -j ACCEPT &&
+    #        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 443 -j ACCEPT &&
+    #        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT &&
+    #        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT
 
     - name: Restarting Nginx service
       ansible.builtin.shell: sudo service nginx restart
