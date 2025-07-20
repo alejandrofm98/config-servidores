@@ -18,5 +18,7 @@
 
     - name: Copy ssl certificates
       ansible.builtin.copy:
-        src: ~/IdeaProjects/config-servidores/configuraciones/ssl_certs/
-        dest: "/home/proyectos/config-servidores/configuraciones/ssl_certs/"
+        src: ~/IdeaProjects/config-servidores/configuraciones/nginx/ssl_certs/
+        dest: "/home/proyectos/config-servidores/configuraciones/nginx/ssl_certs/"
+        force: true
+      become: true

@@ -21,3 +21,5 @@ configuraciones/ssl_certs
 /configuraciones/database/.env
 /configuraciones/sshKeys/private_key_pro.key
 /configuraciones/sshKeys/private_key_utilidades.key
+/configuraciones/nginx/ssl_certs/cert.pem
+/configuraciones/nginx/ssl_certs/key.pem
