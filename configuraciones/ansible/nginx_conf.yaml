@@ -15,3 +15,8 @@
         name: nginx-net
         driver: bridge
         attachable: true
+
+    - name: Copy ssl certificates
+      ansible.builtin.copy:
+        src: ~/IdeaProjects/config-servidores/configuraciones/ssl_certs/
+        dest: "/home/proyectos/config-servidores/configuraciones/ssl_certs/"
