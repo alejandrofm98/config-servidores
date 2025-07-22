@@ -10,7 +10,8 @@ services:
     volumes:
       - ./conf:/etc/nginx/conf.d:ro
       - ./ssl_certs:/etc/letsencrypt/live:ro
-
+    networks:
+      - nginx-net
 
 #  certbot:
 #    image: certbot/certbot
