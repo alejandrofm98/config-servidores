@@ -22,3 +22,15 @@
         dest: "/home/proyectos/config-servidores/configuraciones/nginx/ssl_certs/"
         force: true
       become: true
+
+    - name: Run `docker-compose down`
+      community.docker.docker_compose_v2:
+        project_src: /home/proyectos/config-servidores/configuraciones/nginx/
+        state: absent
+      register: output
+
+    - name: Run `docker-compose up`
+      community.docker.docker_compose_v2:
+        project_src: /home/proyectos/config-servidores/configuraciones/nginx/
+        build: always
+      register: output
