@@ -120,27 +120,7 @@
         src: ~/IdeaProjects/config-servidores/configuraciones/ssl_certs/
         dest: /etc/letsencrypt/live/click2eat.es
 
-#
-#    - name: Copy nginx conf file
-#      ansible.builtin.copy:
-#        src: /home/alejandro/IdeaProjects/config-servidores/configuraciones/aplicacion/{{fichero_nginx}}
-#        dest: /etc/nginx/sites-available/{{fichero_nginx}}
-#        owner: root
-#        group: root
-#        mode: '0644'
-#
-#    - name: Create a symbolic link from sites-available to sites-enabled
-#      ansible.builtin.file:
-#        src: /etc/nginx/sites-available/{{fichero_nginx}}
-#        dest: /etc/nginx/sites-enabled/{{fichero_nginx}}
-#        owner: root
-#        group: root
-#        state: link
 
-#
-#    - name: Checking Nginx configuration
-#      ansible.builtin.shell: sudo nginx -t
-#
 #    Solo es necesario ejecutar 1 vez
 #    - name: Open ports iptable
 #      ansible.builtin.shell:
@@ -149,7 +129,14 @@
 #        sudo iptables -I INPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT &&
 #        sudo iptables -I OUTPUT  -m state --state NEW -p tcp --dport 80 -j ACCEPT
 
-#    - name: Restarting Nginx service
-#      ansible.builtin.shell: sudo service nginx restart
+    - name: Ensure parent directory exists with correct ownership
+      become: yes
+      file:
+        path: /home/proyectos
+        state: directory
+        owner: "{{ ansible_user | default(ansible_ssh_user) }}"
+        group: "{{ ansible_user | default(ansible_ssh_user) }}"
+        mode: '0755'
+
 
 
